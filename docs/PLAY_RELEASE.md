@@ -3,24 +3,30 @@
 ## Already prepared
 
 - Expo managed app **So, When?** by **Palari Labs, Inc.**
-- Android package `com.palarilabs.vemos` (legacy id — change only if Play Console rejects it).
+- Android package `com.sowhen.myapp` (must match Google Play Console).
 - Brand assets in `assets/` (app icon, adaptive icons, splash, store icon, feature graphic).
-- eas.json with internal preview and production profiles (**no EAS projectId/owner invented in-repo**).
+- `eas.json` with internal preview and production profiles.
+- Existing EAS link in `app.json`: owner `palari.io`, project ID `511080a9-ef93-40b2-8948-8e84de2cadd5`.
 - Android-first scope, visual rules, and quality gate in AGENTS.md.
 
 ## EAS project (manual — requires Expo login)
 
-Do **not** invent an EAS `projectId` or `owner` in `app.json`. Under the Palari Expo organization account, run authenticated:
+The repository is linked to the existing EAS project owned by `palari.io`. The
+EAS slug remains `vemos` until an Expo owner renames that project in the EAS
+dashboard. Do not change the local slug by itself because it must keep matching
+the linked project.
+
+To verify the link, authenticate with the Palari Expo organization account and run:
 
 ```bash
-npx eas-cli@latest login
-npx eas-cli@latest init
+npx eas-cli@22.0.0 login
+npx eas-cli@22.0.0 project:info
 ```
 
-Link the existing app to the Palari org project, then:
+Then build a preview:
 
 ```bash
-npx eas-cli@latest build --platform android --profile preview
+npx eas-cli@22.0.0 build --platform android --profile preview
 ```
 
 ## Privacy policy hosting (manual)
@@ -69,8 +75,8 @@ Before calling an internal release ready, install the preview APK and verify:
 
 1. Create **So, When?** in Google Play Console under Palari Labs, Inc.
 2. Complete Store Listing, App Content, Data safety, content rating, and privacy-policy requirements based on the real app behavior.
-3. Run: `npx eas-cli@latest build --platform android --profile production`
-4. Run: `npx eas-cli@latest submit --platform android --profile production`
+3. Run: `npx eas-cli@22.0.0 build --platform android --profile production`
+4. Run: `npx eas-cli@22.0.0 submit --platform android --profile production`
 5. Start in the internal track, then promote only after testing and automated checks pass.
 
 Do not claim no data collected if analytics, crash reporting, accounts, or remote services are introduced later. Update Play forms and the privacy policy with every data-flow change.

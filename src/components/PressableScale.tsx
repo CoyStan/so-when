@@ -26,7 +26,7 @@ type Props = Omit<PressableProps, "style"> & {
 /**
  * Standard calm press feedback for cards and rows: a gentle 0.97 scale
  * instead of the harsher opacity flash. Transform only, reduce-motion aware
- * (design-system/vemos MASTER motion rules).
+ * (design-system/so-when MASTER motion rules).
  *
  * className/style land on a plain inner Pressable (NativeWind-safe);
  * the outer Animated.View only carries the scale transform.

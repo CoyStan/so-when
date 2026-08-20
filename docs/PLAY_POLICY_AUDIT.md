@@ -1,7 +1,7 @@
 # Play Policy Audit — advisory only
 
 **Status:** Advisory scan notes — **not** a compliance certification.
-**Scan context:** So, When? / `@palari-labs/vemos` local-first Expo app.
+**Scan context:** So, When? / `@palari-labs/so-when` local-first Expo app.
 
 This document does **not** certify Play approval. Google Play Review has final authority. Declarations must be checked against the **final AAB** and live Data safety forms.
 
