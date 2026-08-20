@@ -1,12 +1,12 @@
 # Design System Master File
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
+> **LOGIC:** When building a specific page, first check `pages/[page-name].md`.
 > If that file exists, its rules **override** this Master file.
 > If not, strictly follow the rules below.
 
 ---
 
-**Project:** Vemos  
+**Project:** So, When?
 **Source:** ui-ux-pro-max (`nextlevelbuilder`) + Palari Labs brand constraints  
 **Category:** Lifestyle / friendship productivity (calendar-first)  
 **Stack:** Expo React Native + NativeWind  
@@ -16,7 +16,7 @@
 
 ## Brand overrides (must keep)
 
-ui-ux-pro-max suggested calendar blue (`#2563EB`). **Vemos keeps Palari teal** so the product stays on-brand:
+ui-ux-pro-max suggested calendar blue (`#2563EB`). **So, When? keeps Palari teal** so the product stays on-brand:
 
 | Role | Hex | Token |
 |------|-----|-------|

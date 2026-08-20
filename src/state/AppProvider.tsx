@@ -838,9 +838,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           };
           const timeOrPlaceChanged = Boolean(
             patch.startAt ||
-              patch.endAt ||
-              patch.activity !== undefined ||
-              patch.place !== undefined,
+            patch.endAt ||
+            patch.activity !== undefined ||
+            patch.place !== undefined,
           );
           if (timeOrPlaceChanged) {
             updated.friends = updated.friends.map((item) => {

@@ -409,7 +409,7 @@ render path found in evaluation.
   `blockedPermissions` (defense in depth). No plugin grants it; DoD treats
   `tools:node="remove"` as clean.
 - Kept media `kind` as `"friend" | "memory"` only (dropped unused `"contact"`).
-- `.cursor/rules/vemos.mdc` updated to match AGENTS.md (no contact picker).
+- `.cursor/rules/so-when.mdc` updated to match AGENTS.md (no contact picker).
 
 ### WP2
 - Added `logCaughtUpState` in `mutations.ts` (idempotent append) so AppProvider
