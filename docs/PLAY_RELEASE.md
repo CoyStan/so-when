@@ -11,15 +11,32 @@
 
 ## EAS project (manual — requires Expo login)
 
-The repository is linked to the existing EAS project owned by `palari.io`. The
-EAS slug remains `vemos` until an Expo owner renames that project in the EAS
-dashboard. Do not change the local slug by itself because it must keep matching
-the linked project.
+The repository is linked to the existing `so-when` EAS project owned by
+`palari.io`.
 
-To verify the link, authenticate with the Palari Expo organization account and run:
+To verify the link from this Linux VPS with Google authentication, first start
+the normal browser login on the VPS:
 
 ```bash
 npx eas-cli@22.0.0 login
+```
+
+Leave it waiting and note the port in its `localhost` callback URL. In a second
+terminal on the Mac, replace `37869` below with that port and forward it over
+Tailscale:
+
+```bash
+EAS_CALLBACK_PORT=37869
+ssh -N -L "${EAS_CALLBACK_PORT}:localhost:${EAS_CALLBACK_PORT}" \
+  quetza@ubuntu-4gb-hel1-1.tail02545f.ts.net
+```
+
+Keep the SSH command running, then open the EAS login link on the Mac and choose
+Google. The browser's `localhost` callback will cross the SSH tunnel to EAS CLI
+on the VPS. After EAS prints `Logged in`, stop the SSH tunnel and verify:
+
+```bash
+npx eas-cli@22.0.0 whoami
 npx eas-cli@22.0.0 project:info
 ```
 
