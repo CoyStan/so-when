@@ -5,7 +5,18 @@ const { withNativeWind } = require('nativewind/metro');
 const config = getDefaultConfig(__dirname);
 
 // MUI + Emotion ship mixed ESM/CJS entrypoints; package exports break Metro web.
-config.resolver.unstable_enablePackageExports = false;
+// React Native 0.88 resolves its own internals through package exports, so
+// keep them on for native and turn them off only for web.
+const upstreamResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const scoped =
+    platform === 'web'
+      ? { ...context, unstable_enablePackageExports: false }
+      : context;
+  return upstreamResolveRequest
+    ? upstreamResolveRequest(scoped, moduleName, platform)
+    : scoped.resolveRequest(scoped, moduleName, platform);
+};
 if (!config.resolver.sourceExts.includes('cjs')) {
   config.resolver.sourceExts.push('cjs');
 }
