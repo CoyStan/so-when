@@ -293,6 +293,8 @@ export function CreatePlanScreen() {
                     return (
                       <Pressable
                         key={option}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected }}
                         onPress={() => setActivity(selected ? "" : option)}
                         className={cn(
                           "min-h-[44px] items-center justify-center rounded-full border px-4",
@@ -313,6 +315,8 @@ export function CreatePlanScreen() {
                     );
                   })}
                   <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: activity === "custom" }}
                     onPress={() =>
                       setActivity(activity === "custom" ? "" : "custom")
                     }

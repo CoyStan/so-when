@@ -106,7 +106,7 @@ export function AvailabilityScreen() {
           hapticTick();
           setPendingDelete(rule);
         }}
-        className="h-10 w-10 items-center justify-center"
+        className="h-11 w-11 items-center justify-center"
       >
         <Icon name="trash-2" size={18} color={color.muted} />
       </Pressable>
