@@ -43,6 +43,7 @@ import {
   proposePlanWindow,
   sortFriendsForPicker,
 } from "../domain/model";
+import { buildSampleData } from "../domain/sampleData";
 import { formatDateKey, parseDateKey, startOfDay } from "../domain/time";
 import type {
   AppData,
@@ -224,6 +225,8 @@ type AppContextValue = {
   retryPersist: () => Promise<void>;
   startFresh: () => Promise<{ ok: boolean; message?: string }>;
   logCaughtUp: (friendId: string, whenIso: string) => Promise<void>;
+  /** Screenshot builds only (EXPO_PUBLIC_SAMPLE_DATA=1). Replaces all data. */
+  loadSampleData: () => Promise<void>;
   dismissRecoveryWarnings: () => void;
 };
 
@@ -1212,6 +1215,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
+  const loadSampleData = useCallback(async () => {
+    await commit((current) => ({
+      ...buildSampleData(emptyAppData(), new Date(), createId),
+      settings: current.settings,
+    }));
+    clearSelectionState();
+    goWhen();
+  }, [clearSelectionState, commit, goWhen]);
+
   const value = useMemo<AppContextValue>(
     () => ({
       ready,
@@ -1293,6 +1305,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       retryPersist,
       startFresh,
       logCaughtUp,
+      loadSampleData,
       dismissRecoveryWarnings,
     }),
     [
@@ -1373,6 +1386,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       retryPersist,
       startFresh,
       logCaughtUp,
+      loadSampleData,
       dismissRecoveryWarnings,
       getFriendDeletionImpact,
     ],
