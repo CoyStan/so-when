@@ -11,7 +11,7 @@
       "package": "com.sowhen.myapp",
       "allowBackup": false,
       "adaptiveIcon": {
-        "backgroundColor": "#FAF8F5",
+        "backgroundColor": "#147A78",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

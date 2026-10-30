@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  type ScrollViewInstance,
+} from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -499,7 +506,7 @@ export function MonthsView({
     (item) => item.key === currentMonthKey,
   );
 
-  const listRef = useRef<ScrollView>(null);
+  const listRef = useRef<ScrollViewInstance>(null);
   const [sheetDateKey, setSheetDateKey] = useState<string | null>(null);
   const reduceMotion = useReduceMotion();
   const enterProgress = useSharedValue(reduceMotion ? 1 : 0);

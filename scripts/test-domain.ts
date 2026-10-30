@@ -37,6 +37,7 @@ import {
 } from "../src/persistence/migrate";
 import { applyUpdaters } from "../src/persistence/writeQueue";
 import { buildReminderSpecs } from "../src/domain/reminders";
+import { buildSampleData } from "../src/domain/sampleData";
 import {
   buildDayMarks,
   dayMarkSize,
@@ -743,5 +744,32 @@ const doneOnly = markPlanDoneState(
 );
 assert.equal(doneOnly.catchUps.length, 0);
 assert.equal(doneOnly.friends[0]?.lastMetAt, plan710.startAt);
+
+// Sample data for store screenshots: valid, phone-free, varied statuses.
+{
+  const sampleNow = new Date(2026, 9, 14, 10, 0);
+  let sampleSeq = 0;
+  const sample = buildSampleData(
+    emptyAppData(),
+    sampleNow,
+    (prefix) => `${prefix}_${++sampleSeq}`,
+  );
+  const reloaded = migrateAndValidate(JSON.stringify(sample));
+  assert.ok(reloaded.ok);
+  assert.deepEqual(reloaded.warnings, []);
+  assert.equal(reloaded.data.friends.length, 5);
+  assert.equal(reloaded.data.availability.length, 2);
+  assert.equal(reloaded.data.plans.length, 3);
+  assert.ok(reloaded.data.catchUps.length >= 2);
+  assert.ok(reloaded.data.onboardingComplete);
+  assert.ok(sample.friends.every((f) => f.phone === "" && f.photoUri === null));
+  const statuses = new Set(sample.plans.map((p) => p.status));
+  assert.ok(statuses.has("done"));
+  assert.ok(statuses.size >= 2);
+  const due = sample.friends.filter(
+    (f) => catchUpStatus(f, sampleNow) === "due",
+  );
+  assert.ok(due.length >= 1);
+}
 
 console.log("all tests: ok");

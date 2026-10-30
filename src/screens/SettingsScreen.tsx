@@ -31,6 +31,9 @@ function hourLabel(hour: number, timeFormat24h: boolean): string {
   return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
 }
 
+/** Only the `screenshots` EAS profile sets this; production never does. */
+const SAMPLE_DATA_ENABLED = process.env.EXPO_PUBLIC_SAMPLE_DATA === "1";
+
 const CALENDAR_START_HOURS = [5, 6, 7, 8, 9, 10];
 const CALENDAR_END_HOURS = [18, 19, 20, 21, 22, 23, 24];
 
@@ -42,6 +45,7 @@ export function SettingsScreen() {
     wipeData,
     openAvailability,
     openPrivacyPolicy,
+    loadSampleData,
   } = useApp();
   const settings = data.settings;
 
@@ -140,6 +144,21 @@ export function SettingsScreen() {
               }
             })();
           },
+        },
+      ],
+    );
+  };
+
+  const onLoadSample = () => {
+    Alert.alert(
+      "Load sample friends?",
+      "This replaces everything on this phone with made-up friends and plans for screenshots.",
+      [
+        { text: "Keep my data", style: "cancel" },
+        {
+          text: "Replace with samples",
+          style: "destructive",
+          onPress: () => void loadSampleData(),
         },
       ],
     );
@@ -273,6 +292,16 @@ export function SettingsScreen() {
           />
           <Button label="Delete all data" variant="ghost" onPress={onWipe} />
         </Section>
+
+        {SAMPLE_DATA_ENABLED ? (
+          <Section title="Screenshots">
+            <Button
+              label="Load sample friends"
+              variant="ghost"
+              onPress={onLoadSample}
+            />
+          </Section>
+        ) : null}
 
         <Section title="About">
           <Text className="text-body text-muted">

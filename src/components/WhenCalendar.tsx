@@ -5,6 +5,7 @@ import {
   Text,
   View,
   type LayoutChangeEvent,
+  type ScrollViewInstance,
 } from "react-native";
 
 import { formatClock, PLAN_STATUS_LABELS, slotIsBooked } from "../domain/model";
@@ -69,7 +70,7 @@ export function WhenCalendar({
   now,
 }: Props) {
   const [gridWidth, setGridWidth] = useState(0);
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const todayKey = formatDateKey(now);
   const focusKey = formatDateKey(focusDate);
   const startHour = Math.max(0, Math.min(23, dayStartHour));

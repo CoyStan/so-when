@@ -61,7 +61,7 @@ npx eas-cli@22.0.0 build --platform android --profile preview
 | `assets/icon.png` | App icon source (1024×1024) |
 | `assets/android-icon-*.png` | Adaptive icon layers |
 
-Wordmark: teal **So,** stacked above ink **When?** in Quicksand Bold on warm canvas.
+Mark: white **S** with a coral comma on teal ("S,"), Quicksand Bold. The full **So, When?** wordmark appears only on the feature graphic. Regenerate everything with `python3 scripts/generate-brand-assets.py` (needs Pillow).
 
 ## Contact permission — resolved
 

@@ -15,6 +15,12 @@
         "buildType": "apk"
       }
     },
+    "screenshots": {
+      "extends": "preview",
+      "env": {
+        "EXPO_PUBLIC_SAMPLE_DATA": "1"
+      }
+    },
     "production": {
       "autoIncrement": true,
       "android": {
