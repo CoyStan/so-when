@@ -50,9 +50,9 @@ Things only you can do: log in to accounts (Expo, Google Play), hold the phone, 
 
 **Files:** Modify `package.json`, `package-lock.json`.
 
-- [ ] Run `npx expo install --fix`.
-- [ ] Run the full gate list. Expected: `expo-doctor` reports 21/21 checks passed; everything else passes.
-- [ ] Commit `Fix Expo dependency drift so expo-doctor passes`.
+- [x] Run `npx expo install --fix`.
+- [x] Run the full gate list. Expected: `expo-doctor` reports 21/21 checks passed; everything else passes.
+- [x] Commit `Fix Expo dependency drift so expo-doctor passes`.
 
 ### Task 2: Root error boundary
 
@@ -60,13 +60,13 @@ Things only you can do: log in to accounts (Expo, Google Play), hold the phone, 
 
 **Interfaces:** Produces `ErrorBoundary` (React class component, props `{ children: ReactNode }`).
 
-- [ ] Implement `ErrorBoundary` with `getDerivedStateFromError`. Fallback uses `Screen`, `Card`, `Button`, Quicksand, `foundation.ts` colors. Copy (exact):
+- [x] Implement `ErrorBoundary` with `getDerivedStateFromError`. Fallback uses `Screen`, `Card`, `Button`, Quicksand, `foundation.ts` colors. Copy (exact):
   - Title: `Something went sideways`
   - Body: `Your friends and plans are still saved on this phone.`
   - Button: `Try again` (clears the error state and re-renders children)
-- [ ] The fallback must not depend on `useApp()` (the provider may be what crashed).
-- [ ] Run the gate list. Expected: all pass.
-- [ ] Commit `Add root error boundary with calm recovery screen`.
+- [x] The fallback must not depend on `useApp()` (the provider may be what crashed).
+- [x] Run the gate list. Expected: all pass.
+- [x] Commit `Add root error boundary with calm recovery screen`.
 
 ### Task 3: Upgrade to Expo SDK 58
 
@@ -74,12 +74,14 @@ Why: SDK 58 is current (released 2026-09-29). Building the first tester release 
 
 **Files:** `package.json`, `package-lock.json`, possibly `app.json`, any file the changelog flags.
 
-- [ ] Run `npx expo install expo@^58.0.0 --fix`.
-- [ ] Read the SDK 58 changelog for packages this app uses: `expo-calendar` (the app imports `expo-calendar/legacy`), `expo-notifications`, `expo-file-system`, `expo-image-picker`, `expo-sharing`, `react-native-reanimated`, `nativewind`. Fix any breaking change.
-- [ ] Run the gate list. Expected: all pass, `expo-doctor` 21/21.
-- [ ] Start Metro and request the Android bundle: `curl -s -o /dev/null -w '%{http_code}' 'localhost:8081/index.bundle?platform=android&dev=true'`. Expected: `200`.
-- [ ] Commit `Upgrade to Expo SDK 58`.
-- [ ] If an upgrade blocker cannot be fixed in half a day, revert this task and stay on SDK 57 for testers. Note the blocker here.
+- [x] Run `npx expo install expo@^58.0.0 --fix`.
+- [x] Read the SDK 58 changelog for packages this app uses: `expo-calendar` (the app imports `expo-calendar/legacy`), `expo-notifications`, `expo-file-system`, `expo-image-picker`, `expo-sharing`, `react-native-reanimated`, `nativewind`. Fix any breaking change.
+- [x] Run the gate list. Expected: all pass, `expo-doctor` 21/21.
+- [x] Start Metro and request the Android bundle: `curl -s -o /dev/null -w '%{http_code}' 'localhost:8081/index.bundle?platform=android&dev=true'`. Expected: `200`.
+- [x] Commit `Upgrade to Expo SDK 58`.
+- [x] If an upgrade blocker cannot be fixed in half a day, revert this task and stay on SDK 57 for testers. Note the blocker here.
+
+  Notes (done 2026-10-30): RN 0.88 needs Metro package exports, so `metro.config.js` turns them off only for web (MUI). Strict TS API: ScrollView refs are `ScrollViewInstance`. `.npmrc` sets `legacy-peer-deps` because datetimepicker's optional `react-native-windows` peer blocks installs. On-device check still pending (Task 5); SDK 58 turns on R8 for release builds, so test the production AAB too.
 
 ## Phase 1. First real build
 
@@ -108,7 +110,7 @@ Why: the current icon is the full "So, When?" wordmark. At 48 dp on a home scree
 
 **Files:** `scripts/generate-brand-assets.py`, all of `assets/*.png` except `favicon.png` (regenerate that too).
 
-- [ ] Claude drafts 3 symbol-only options in brand colors (teal `#147A78`, coral `#F28C78`, canvas `#FAF8F5`), for example a speech bubble with a question mark, or a teal comma. Shows each at real size (48 px) and large.
+- [x] Claude drafts 3 symbol-only options in brand colors (teal `#147A78`, coral `#F28C78`, canvas `#FAF8F5`), for example a speech bubble with a question mark, or a teal comma. Shows each at real size (48 px) and large.
 - [ ] YOU pick one.
 - [ ] Claude regenerates icon, adaptive foreground/background/monochrome, splash, notification icon, store icon, and feature graphic from the script. Gate list, commit.
 
@@ -116,10 +118,10 @@ Why: the current icon is the full "So, When?" wordmark. At 48 dp on a home scree
 
 **Files:** screens flagged by the pass, likely `CreatePlanScreen.tsx` and `AddAvailabilityScreen.tsx` (fewer accessibility labels than pressables).
 
-- [ ] Every `Pressable`/`PressableScale` has text children or an `accessibilityLabel`, plus an `accessibilityRole`.
-- [ ] Every touch target is at least 44x44 (`minHeight`/`hitSlop`).
+- [x] Every `Pressable`/`PressableScale` has text children or an `accessibilityLabel`, plus an `accessibilityRole`.
+- [x] Every touch target is at least 44x44 (`minHeight`/`hitSlop`).
 - [ ] Fix anything the Task 5 large-font walk clipped.
-- [ ] Gate list, commit.
+- [x] Gate list, commit. (Code pass done 2026-10-30: two activity chips got roles; delete button 40 to 44 px.)
 
 ### Task 9: Wording pass
 
@@ -132,12 +134,12 @@ Why: the current icon is the full "So, When?" wordmark. At 48 dp on a home scree
 
 **Files:** Create `src/domain/sampleData.ts`. Modify `src/screens/SettingsScreen.tsx`, `eas.json`.
 
-**Interfaces:** Produces `buildSampleData(now: Date): AppData` (5 friends with fictional names, 2 recurring availability rules, 3 plans in different statuses, 2 catch-up logs).
+**Interfaces:** Produces `buildSampleData(base: AppData, now: Date, createId: (prefix: string) => string): AppData` (`base` is `emptyAppData()`, keeping domain free of persistence; 5 friends with fictional names, 2 recurring availability rules, 3 plans in different statuses, 2 catch-up logs).
 
-- [ ] Test first in `scripts/test-domain.ts`: `buildSampleData` output passes the existing migration/validation path unchanged and contains no phone numbers.
-- [ ] Settings shows a "Load sample friends" row only when `process.env.EXPO_PUBLIC_SAMPLE_DATA === "1"`. It asks for confirmation, then replaces all data.
-- [ ] Add an EAS profile `screenshots` (copy of `preview` plus `"env": { "EXPO_PUBLIC_SAMPLE_DATA": "1" }`). The `production` profile must not set it.
-- [ ] Gate list, commit.
+- [x] Test first in `scripts/test-domain.ts`: `buildSampleData` output passes the existing migration/validation path unchanged and contains no phone numbers.
+- [x] Settings shows a "Load sample friends" row only when `process.env.EXPO_PUBLIC_SAMPLE_DATA === "1"`. It asks for confirmation, then replaces all data.
+- [x] Add an EAS profile `screenshots` (copy of `preview` plus `"env": { "EXPO_PUBLIC_SAMPLE_DATA": "1" }`). The `production` profile must not set it.
+- [x] Gate list, commit.
 
 ### Task 11: Store screenshots and feature graphic
 
