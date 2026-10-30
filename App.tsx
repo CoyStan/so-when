@@ -12,6 +12,7 @@ import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { BottomNav } from "./src/components/BottomNav";
+import { ErrorBoundary } from "./src/components/ErrorBoundary";
 import { MuiPickerProvider } from "./src/components/MuiPickerProvider";
 import { SaveErrorBanner } from "./src/components/SaveErrorBanner";
 import { ScreenTransition } from "./src/components/ScreenTransition";
@@ -162,11 +163,13 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <MuiPickerProvider>
-        <AppProvider>
-          <Root />
-        </AppProvider>
-      </MuiPickerProvider>
+      <ErrorBoundary>
+        <MuiPickerProvider>
+          <AppProvider>
+            <Root />
+          </AppProvider>
+        </MuiPickerProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }
