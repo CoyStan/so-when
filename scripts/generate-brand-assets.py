@@ -1,110 +1,125 @@
 #!/usr/bin/env python3
-"""Regenerate So, When? brand icons from Quicksand Bold."""
+"""Regenerate So, When? brand assets from Quicksand Bold.
+
+The mark is a white "S" with a coral comma on teal ("S,"). The wordmark
+("So, When?") appears only where there is room to read it: the feature
+graphic. Requires Pillow: python3 -m pip install pillow
+"""
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
-ASSETS = Path(__file__).resolve().parent.parent / 'assets'
-FONT_PATH = Path(__file__).resolve().parent.parent / (
-    'node_modules/@expo-google-fonts/quicksand/700Bold/Quicksand_700Bold.ttf'
-)
+ROOT = Path(__file__).resolve().parent.parent
+ASSETS = ROOT / 'assets'
+FONT_PATH = ROOT / 'node_modules/@expo-google-fonts/quicksand/700Bold/Quicksand_700Bold.ttf'
 TEAL = (20, 122, 120, 255)
+CORAL = (242, 140, 120, 255)
 INK = (42, 44, 49, 255)
+MUTED = (107, 114, 128, 255)
 CANVAS = (250, 248, 245, 255)
+WHITE = (255, 255, 255, 255)
+CLEAR = (0, 0, 0, 0)
 
 
 def load_font(size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(FONT_PATH), size=size)
 
 
-def measure(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont):
-    box = draw.textbbox((0, 0), text, font=font)
-    return box[2] - box[0], box[3] - box[1], box
-
-
-def draw_logo(size: int, bg, line1_color, line2_color, pad_ratio=0.12, monochrome=False):
+def draw_mark(size: int, bg, s_color, comma_color, scale: float = 1.0) -> Image.Image:
+    """The "S," mark centered on a square. scale=1.0 fills a full-bleed icon;
+    smaller values keep it inside Android's adaptive-icon safe zone."""
     img = Image.new('RGBA', (size, size), bg)
     draw = ImageDraw.Draw(img)
-    target_width = size * (1 - 2 * pad_ratio)
-    font_size = int(size * 0.28)
-    line1, line2 = 'So,', 'When?'
-
-    def dims(fs):
-        f = load_font(fs)
-        w1, h1, _ = measure(draw, line1, f)
-        w2, h2, _ = measure(draw, line2, f)
-        gap = int(fs * 0.08)
-        return f, w1, h1, w2, h2, gap, max(w1, w2), h1 + gap + h2
-
-    f, w1, h1, w2, h2, gap, block_w, block_h = dims(font_size)
-    while (block_w > target_width or block_h > size * (1 - 2 * pad_ratio)) and font_size > 20:
-        font_size -= 2
-        f, w1, h1, w2, h2, gap, block_w, block_h = dims(font_size)
-
-    top = (size - block_h) / 2 - size * 0.02
-    x1 = (size - w1) / 2
-    x2 = (size - w2) / 2
-    _, _, b1 = measure(draw, line1, f)
-    _, _, b2 = measure(draw, line2, f)
-    y1 = top - b1[1]
-    y2 = top + h1 + gap - b2[1]
-    c1 = c2 = (0, 0, 0, 255) if monochrome else (line1_color, line2_color)[0:2]
-    if not monochrome:
-        c1, c2 = line1_color, line2_color
-    draw.text((x1, y1), line1, font=f, fill=c1)
-    draw.text((x2, y2), line2, font=f, fill=c2)
+    font = load_font(int(size * 0.6 * scale))
+    gap = size * 0.03 * scale
+    sb = draw.textbbox((0, 0), 'S', font=font)
+    cb = draw.textbbox((0, 0), ',', font=font)
+    s_w = sb[2] - sb[0]
+    s_h = sb[3] - sb[1]
+    total_w = s_w + gap + (cb[2] - cb[0])
+    # Center the pair horizontally and the S vertically; the comma hangs
+    # below the baseline the way it does in text.
+    x = (size - total_w) / 2 - sb[0]
+    y = (size - s_h) / 2 - sb[1] - size * 0.02 * scale
+    draw.text((x, y), 'S', font=font, fill=s_color)
+    draw.text((x + sb[0] + s_w + gap - cb[0], y), ',', font=font, fill=comma_color)
     return img
 
 
-def save_rgb_canvas(img: Image.Image, name: str, size=None):
-    out = img.copy()
-    if size:
-        out = out.resize((size, size), Image.Resampling.LANCZOS)
-    rgb = Image.new('RGB', out.size, CANVAS[:3])
-    rgb.paste(out, mask=out.split()[3] if out.mode == 'RGBA' else None)
-    path = ASSETS / name
-    rgb.save(path, 'PNG')
-    print(f'wrote {path}')
+def rounded(img: Image.Image, radius_ratio: float = 0.22) -> Image.Image:
+    mask = Image.new('L', img.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle(
+        (0, 0, img.size[0] - 1, img.size[1] - 1),
+        radius=int(img.size[0] * radius_ratio),
+        fill=255,
+    )
+    out = Image.new('RGBA', img.size, CLEAR)
+    out.paste(img, (0, 0), mask)
+    return out
+
+
+def on_canvas(img: Image.Image, size: int, tile: int) -> Image.Image:
+    """Center a rounded tile of `tile` px on a CANVAS square of `size` px."""
+    out = Image.new('RGBA', (size, size), CANVAS)
+    small = rounded(img).resize((tile, tile), Image.Resampling.LANCZOS)
+    offset = (size - tile) // 2
+    out.paste(small, (offset, offset), small)
+    return out
+
+
+def save(img: Image.Image, name: str, size: int | None = None, rgb: bool = False):
+    out = img.resize((size, size), Image.Resampling.LANCZOS) if size else img
+    if rgb:
+        out = out.convert('RGB')
+    out.save(ASSETS / name, 'PNG')
+    print(f'wrote assets/{name}')
+
+
+def feature_graphic() -> Image.Image:
+    feat = Image.new('RGBA', (1024, 500), CANVAS)
+    draw = ImageDraw.Draw(feat)
+    tile = rounded(draw_mark(1024, TEAL, WHITE, CORAL)).resize(
+        (220, 220), Image.Resampling.LANCZOS
+    )
+    feat.paste(tile, (120, 140), tile)
+
+    left = 120 + 220 + 64
+    title = load_font(92)
+    so_box = draw.textbbox((0, 0), 'So, ', font=title)
+    draw.text((left, 150 - so_box[1]), 'So, ', font=title, fill=TEAL)
+    draw.text((left + so_box[2] - so_box[0], 150 - so_box[1]), 'When?', font=title, fill=INK)
+
+    body = load_font(30)
+    for i, line in enumerate(['Turn “we should catch up”', 'into an actual plan.']):
+        box = draw.textbbox((0, 0), line, font=body)
+        draw.text((left, 268 + i * 42 - box[1]), line, font=body, fill=INK)
+
+    footer = load_font(22)
+    box = draw.textbbox((0, 0), 'Palari Labs, Inc.', font=footer)
+    draw.text((left, 400 - box[1]), 'Palari Labs, Inc.', font=footer, fill=MUTED)
+    return feat
 
 
 def main():
     ASSETS.mkdir(exist_ok=True)
-    icon = draw_logo(1024, CANVAS, TEAL, INK, pad_ratio=0.14)
-    save_rgb_canvas(icon, 'icon.png')
-    draw_logo(1024, (0, 0, 0, 0), TEAL, INK, pad_ratio=0.22).save(
-        ASSETS / 'android-icon-foreground.png', 'PNG'
-    )
-    Image.new('RGBA', (1024, 1024), CANVAS).save(ASSETS / 'android-icon-background.png', 'PNG')
-    draw_logo(1024, (0, 0, 0, 0), INK, INK, pad_ratio=0.22, monochrome=True).save(
-        ASSETS / 'android-icon-monochrome.png', 'PNG'
-    )
-    save_rgb_canvas(draw_logo(1024, CANVAS, TEAL, INK, pad_ratio=0.16), 'splash-icon.png')
-    save_rgb_canvas(draw_logo(512, CANVAS, TEAL, INK, pad_ratio=0.14), 'favicon.png', size=48)
-    save_rgb_canvas(draw_logo(512, CANVAS, TEAL, INK, pad_ratio=0.14), 'store-icon-512.png')
+    full = draw_mark(1024, TEAL, WHITE, CORAL)
 
-    feat = Image.new('RGB', (1024, 500), CANVAS[:3])
-    draw = ImageDraw.Draw(feat)
-    font_size = 120
-    f = load_font(font_size)
-    line1, line2 = 'So,', 'When?'
-    w1, h1, b1 = measure(draw, line1, f)
-    w2, h2, b2 = measure(draw, line2, f)
-    gap = 10
-    while max(w1, w2) > 900 and font_size > 40:
-        font_size -= 4
-        f = load_font(font_size)
-        w1, h1, b1 = measure(draw, line1, f)
-        w2, h2, b2 = measure(draw, line2, f)
-        gap = int(font_size * 0.08)
-    block_h = h1 + gap + h2
-    top = (500 - block_h) / 2 - 8
-    draw.text(((1024 - w1) / 2, top - b1[1]), line1, font=f, fill=TEAL[:3])
-    draw.text(((1024 - w2) / 2, top + h1 + gap - b2[1]), line2, font=f, fill=INK[:3])
-    small = load_font(22)
-    footer = 'Palari Labs, Inc.'
-    fw, fh, fb = measure(draw, footer, small)
-    draw.text(((1024 - fw) / 2, 500 - fh - 28 - fb[1]), footer, font=small, fill=(107, 114, 128))
-    feat.save(ASSETS / 'store-feature-graphic.png', 'PNG')
-    print('wrote assets/store-feature-graphic.png')
+    # Launcher + store: full-bleed square; the OS / Play applies its own mask.
+    save(full, 'icon.png', rgb=True)
+    save(full, 'store-icon-512.png', size=512, rgb=True)
+
+    # Android adaptive icon: mark inside the 66% safe zone over solid teal.
+    save(draw_mark(1024, CLEAR, WHITE, CORAL, scale=0.78), 'android-icon-foreground.png')
+    save(Image.new('RGBA', (1024, 1024), TEAL), 'android-icon-background.png')
+    save(draw_mark(1024, CLEAR, (0, 0, 0, 255), (0, 0, 0, 255), scale=0.78), 'android-icon-monochrome.png')
+
+    # Status-bar notification icon: Android uses alpha only, so white on clear.
+    save(draw_mark(384, CLEAR, WHITE, WHITE, scale=1.1), 'notification-icon.png', size=96)
+
+    # Splash (shown on the canvas background from app.json) and web favicon.
+    save(on_canvas(full, 1024, 640), 'splash-icon.png')
+    save(rounded(full), 'favicon.png', size=48)
+
+    save(feature_graphic(), 'store-feature-graphic.png', rgb=True)
     print('done')
 
 

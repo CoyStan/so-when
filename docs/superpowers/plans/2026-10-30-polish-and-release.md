@@ -111,8 +111,8 @@ Why: the current icon is the full "So, When?" wordmark. At 48 dp on a home scree
 **Files:** `scripts/generate-brand-assets.py`, all of `assets/*.png` except `favicon.png` (regenerate that too).
 
 - [x] Claude drafts 3 symbol-only options in brand colors (teal `#147A78`, coral `#F28C78`, canvas `#FAF8F5`), for example a speech bubble with a question mark, or a teal comma. Shows each at real size (48 px) and large.
-- [ ] YOU pick one.
-- [ ] Claude regenerates icon, adaptive foreground/background/monochrome, splash, notification icon, store icon, and feature graphic from the script. Gate list, commit.
+- [x] YOU pick one. (Chose C, the "S," monogram, 2026-10-30.)
+- [x] Claude regenerates icon, adaptive foreground/background/monochrome, splash, notification icon, store icon, and feature graphic from the script. Gate list, commit.
 
 ### Task 8: Accessibility and large-font pass
 
